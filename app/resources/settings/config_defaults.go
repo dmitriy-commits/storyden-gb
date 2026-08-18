@@ -17,8 +17,15 @@ func (d *SettingsRepository) hydrateConfigDefaults(in *ent.Setting) (*Settings, 
 
 	d.hydrateClientIPDefaults(settings)
 	d.hydrateRateLimitDefaults(settings)
+	d.hydrateThreadCategoryDefaults(settings)
 
 	return settings, nil
+}
+
+func (d *SettingsRepository) hydrateThreadCategoryDefaults(settings *Settings) {
+	if !settings.RequireThreadCategory.Ok() {
+		settings.RequireThreadCategory = opt.New(false)
+	}
 }
 
 func (d *SettingsRepository) hydrateClientIPDefaults(settings *Settings) {

@@ -23,12 +23,13 @@ const DefaultColour = "hsl(157, 65%, 44%)"
 var defaultContent, _ = datagraph.NewRichText(DefaultContent)
 
 var DefaultSettings = Settings{
-	Title:              opt.New(DefaultTitle),
-	Description:        opt.New(DefaultDescription),
-	Content:            opt.New(defaultContent),
-	AccentColour:       opt.New(DefaultColour),
-	AuthenticationMode: opt.New(authentication.ModeHandle),
-	RegistrationMode:   opt.New(RegistrationModePublic),
+	Title:                 opt.New(DefaultTitle),
+	Description:           opt.New(DefaultDescription),
+	Content:               opt.New(defaultContent),
+	AccentColour:          opt.New(DefaultColour),
+	AuthenticationMode:    opt.New(authentication.ModeHandle),
+	RegistrationMode:      opt.New(RegistrationModePublic),
+	RequireThreadCategory: opt.New(false),
 	Services: opt.New(ServiceSettings{
 		Moderation: opt.New(ModerationServiceSettings{
 			ThreadBodyLengthMax: opt.New(60000),

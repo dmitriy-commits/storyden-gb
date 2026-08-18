@@ -41,6 +41,9 @@ type Settings struct {
 	// accounts publicly, only via invitation, or not at all.
 	RegistrationMode opt.Optional[RegistrationMode]
 
+	// RequireThreadCategory controls whether new root threads must have a category.
+	RequireThreadCategory opt.Optional[bool]
+
 	Services opt.Optional[ServiceSettings]
 
 	// Metadata is an arbitrary object which can be used by frontends/clients to
