@@ -19,3 +19,11 @@ backend
 clean
 migrate
 seed
+
+# Local AI tooling and docs — not for repo
+.agents/
+.claude/
+_bmad/
+_bmad-output/
+docs/
+.pnpm-store/

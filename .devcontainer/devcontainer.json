@@ -1,0 +1,74 @@
+{
+  "name": "Storyden Devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "TZ": "${localEnv:TZ:UTC}"
+    }
+  },
+  "remoteUser": "vscode",
+  "runArgs": ["--name=storyden-gb-devcontainer", "--hostname=storyden-workbench", "-p=8000:8000", "-p=3000:3000"],
+  "updateRemoteUserUID": true,
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 8000, 5432, 6379, 5672, 15672],
+  "portsAttributes": {
+    "3000": { "label": "Storyden Web" },
+    "8000": { "label": "Storyden API" },
+    "5432": { "label": "Postgres" },
+    "6379": { "label": "Redis" },
+    "5672": { "label": "RabbitMQ" },
+    "15672": { "label": "RabbitMQ UI" }
+  },
+  "mounts": [
+    "source=storyden-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=storyden-go-modcache-${devcontainerId},target=/home/vscode/go/pkg/mod,type=volume",
+    "source=storyden-go-buildcache-${devcontainerId},target=/home/vscode/.cache/go-build,type=volume",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh-host,type=bind,readonly,consistency=cached",
+    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/tmux/tmux.conf,target=/home/vscode/.config/tmux/tmux.conf,type=bind,readonly,consistency=cached",
+    "source=${localEnv:HOME}/.config/nvim,target=/home/vscode/.config/nvim,type=bind,readonly,consistency=cached",
+    "source=${localEnv:HOME}/.config/omarchy/current/theme,target=/home/dmitriy/.config/omarchy/current/theme,type=bind,readonly,consistency=cached",
+    "source=${localEnv:HOME}/.local/share/nvim,target=/home/vscode/.local/share/nvim,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.local/state/nvim,target=/home/vscode/.local/state/nvim,type=bind,consistency=cached"
+  ],
+  "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+  },
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent",
+    "GOPATH": "/home/vscode/go",
+    "GOMODCACHE": "/home/vscode/go/pkg/mod",
+    "GOCACHE": "/home/vscode/.cache/go-build"
+  },
+  "postCreateCommand": "/usr/local/bin/setup-git.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.Go",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          }
+        }
+      }
+    }
+  }
+}
