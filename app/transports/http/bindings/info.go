@@ -138,18 +138,19 @@ func (i Info) BannerUpload(ctx context.Context, request openapi.BannerUploadRequ
 
 func serialiseInfo(info *instance_info.Info) openapi.Info {
 	return openapi.Info{
-		Title:              info.Settings.Title.OrZero(),
-		Description:        info.Settings.Description.OrZero(),
-		Content:            info.Settings.Content.OrZero().HTML(),
-		AccentColour:       info.Settings.AccentColour.OrZero(),
-		OnboardingStatus:   openapi.OnboardingStatus(info.OnboardingStatus.String()),
-		AuthenticationMode: openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
-		RegistrationMode:   openapi.RegistrationMode(info.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
-		Capabilities:       serialiseCapabilitiesList(info.Capabilities),
-		WebAddress:         info.WebAddress.String(),
-		ApiAddress:         info.APIAddress.String(),
-		Metadata:           (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
-		Motd:               opt.Map(info.Settings.Motd, serialiseMOTD).Ptr(),
+		Title:                 info.Settings.Title.OrZero(),
+		Description:           info.Settings.Description.OrZero(),
+		Content:               info.Settings.Content.OrZero().HTML(),
+		AccentColour:          info.Settings.AccentColour.OrZero(),
+		OnboardingStatus:      openapi.OnboardingStatus(info.OnboardingStatus.String()),
+		AuthenticationMode:    openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		RegistrationMode:      openapi.RegistrationMode(info.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
+		RequireThreadCategory: info.Settings.RequireThreadCategory.Or(false),
+		Capabilities:          serialiseCapabilitiesList(info.Capabilities),
+		WebAddress:            info.WebAddress.String(),
+		ApiAddress:            info.APIAddress.String(),
+		Metadata:              (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
+		Motd:                  opt.Map(info.Settings.Motd, serialiseMOTD).Ptr(),
 	}
 }
 

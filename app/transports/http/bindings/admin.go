@@ -265,15 +265,16 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	}
 
 	_, err = a.settingsManager.Set(ctx, settings.Settings{
-		Title:              opt.NewPtr(request.Body.Title),
-		Description:        opt.NewPtr(request.Body.Description),
-		Content:            content,
-		AccentColour:       opt.NewPtr(request.Body.AccentColour),
-		AuthenticationMode: authMode,
-		RegistrationMode:   registrationMode,
-		Services:           services,
-		Metadata:           opt.NewPtr((*map[string]any)(request.Body.Metadata)),
-		Motd:               motd,
+		Title:                 opt.NewPtr(request.Body.Title),
+		Description:           opt.NewPtr(request.Body.Description),
+		Content:               content,
+		AccentColour:          opt.NewPtr(request.Body.AccentColour),
+		AuthenticationMode:    authMode,
+		RegistrationMode:      registrationMode,
+		RequireThreadCategory: opt.NewPtr(request.Body.RequireThreadCategory),
+		Services:              services,
+		Metadata:              opt.NewPtr((*map[string]any)(request.Body.Metadata)),
+		Motd:                  motd,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -907,18 +908,19 @@ func optionalOAuthScopePolicy(in *openapi.OAuthClientScopePolicy) opt.Optional[o
 
 func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
-		AccentColour:       in.Settings.AccentColour.OrZero(),
-		Description:        in.Settings.Description.OrZero(),
-		Content:            in.Settings.Content.OrZero().HTML(),
-		Title:              in.Settings.Title.OrZero(),
-		AuthenticationMode: openapi.AuthMode(in.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
-		RegistrationMode:   openapi.RegistrationMode(in.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
-		WebAddress:         in.WebAddress.String(),
-		ApiAddress:         in.APIAddress.String(),
-		Services:           opt.Map(in.Settings.Services, serialiseServiceSettings).Ptr(),
-		Metadata:           (*openapi.Metadata)(in.Settings.Metadata.Ptr()),
-		Motd:               opt.Map(in.Settings.Motd, serialiseMOTD).Ptr(),
-		Headers:            headers,
+		AccentColour:          in.Settings.AccentColour.OrZero(),
+		Description:           in.Settings.Description.OrZero(),
+		Content:               in.Settings.Content.OrZero().HTML(),
+		Title:                 in.Settings.Title.OrZero(),
+		AuthenticationMode:    openapi.AuthMode(in.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		RegistrationMode:      openapi.RegistrationMode(in.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
+		RequireThreadCategory: in.Settings.RequireThreadCategory.Or(false),
+		WebAddress:            in.WebAddress.String(),
+		ApiAddress:            in.APIAddress.String(),
+		Services:              opt.Map(in.Settings.Services, serialiseServiceSettings).Ptr(),
+		Metadata:              (*openapi.Metadata)(in.Settings.Metadata.Ptr()),
+		Motd:                  opt.Map(in.Settings.Motd, serialiseMOTD).Ptr(),
+		Headers:               headers,
 	}
 }
 
