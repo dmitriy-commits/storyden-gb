@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -93,6 +94,7 @@ type service struct {
 	threadQuerier  *thread_querier.Querier
 	threadWriter   *thread_writer.Writer
 	tagWriter      *tag_writer.Writer
+	settings       *settings.SettingsRepository
 	fetcher        *fetcher.Fetcher
 	recommender    semdex.Recommender
 	bus            *pubsub.Bus
@@ -109,6 +111,7 @@ func New(
 	threadQuerier *thread_querier.Querier,
 	threadWriter *thread_writer.Writer,
 	tagWriter *tag_writer.Writer,
+	settings *settings.SettingsRepository,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
 	bus *pubsub.Bus,
@@ -124,6 +127,7 @@ func New(
 		threadQuerier:  threadQuerier,
 		threadWriter:   threadWriter,
 		tagWriter:      tagWriter,
+		settings:       settings,
 		fetcher:        fetcher,
 		recommender:    recommender,
 		bus:            bus,

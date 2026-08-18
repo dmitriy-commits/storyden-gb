@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -29,6 +30,10 @@ func (s *service) Create(ctx context.Context,
 	partial Partial,
 ) (*thread.Thread, error) {
 	if err := authoriseMutation(ctx, partial); err != nil {
+		return nil, err
+	}
+
+	if err := s.validateCategoryRequirement(ctx, partial); err != nil {
 		return nil, err
 	}
 
@@ -107,6 +112,24 @@ func (s *service) Create(ctx context.Context,
 	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)
 
 	return thr, nil
+}
+
+func (s *service) validateCategoryRequirement(ctx context.Context, partial Partial) error {
+	settings, err := s.settings.Get(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !settings.RequireThreadCategory.Or(false) || partial.Category.Ok() {
+		return nil
+	}
+
+	return fault.New(
+		"thread category is required",
+		fctx.With(ctx),
+		ftag.With(ftag.InvalidArgument),
+		fmsg.WithDesc("missing category", "Choose a category before creating a thread."),
+	)
 }
 
 func authoriseMutation(ctx context.Context, partial Partial) error {
