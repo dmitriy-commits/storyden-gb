@@ -9,12 +9,15 @@ import { Account, Category, LinkReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 import { useFeedMutations } from "@/lib/feed/mutation";
+import { useSettings } from "@/lib/settings/settings-client";
+import { Settings } from "@/lib/settings/settings";
 import { useClickAway } from "@/utils/useClickAway";
 
 export type Props = {
   initialSession?: Account;
   initialCategory?: Category | null;
   showCategorySelect: boolean;
+  initialSettings?: Settings;
 };
 
 export const FormSchema = z.object({
@@ -23,8 +26,12 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useQuickShare({ initialCategory }: Props) {
+export function useQuickShare({ initialCategory, initialSettings }: Props) {
   const session = useSession();
+  const { settings } = useSettings(initialSettings);
+  const requiresCategorySelect = Boolean(
+    settings?.require_thread_category && !isCategory(initialCategory),
+  );
   const [editing, setEditing] = useState(false);
   const [postURL, setPostURL] = useState<string | null>(null);
   const [hydratedLink, setHydratedLink] = useState<
@@ -81,7 +88,22 @@ export function useQuickShare({ initialCategory }: Props) {
           : [initialCategory.slug],
   });
 
+  function validateCategory(category: string | undefined) {
+    if (!settings?.require_thread_category) return true;
+    if (category && category !== NO_CATEGORY_VALUE) {
+      form.clearErrors("category");
+      return true;
+    }
+
+    form.setError("category", {
+      message: "Choose a category before creating a thread.",
+    });
+    return false;
+  }
+
   const handlePost = form.handleSubmit((data: Form) => {
+    if (!validateCategory(data.category)) return;
+
     handle(
       async () => {
         const parsed = new DOMParser().parseFromString(
@@ -141,12 +163,17 @@ export function useQuickShare({ initialCategory }: Props) {
       editing,
       hydratedLink,
       resetKey,
+      requiresCategorySelect,
     },
     handlers: {
       handleFocus,
       handlePost,
     },
   };
+}
+
+function isCategory(category: Category | null | undefined): category is Category {
+  return Boolean(category?.id);
 }
 
 function getFirstURL(html: Document) {

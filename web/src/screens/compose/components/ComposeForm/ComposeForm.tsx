@@ -3,7 +3,8 @@ import { FormProvider } from "react-hook-form";
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
 import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
 import { Button } from "@/components/ui/button";
-import { HStack, WStack, styled } from "@/styled-system/jsx";
+import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { BodyInput } from "../BodyInput/BodyInput";
 import { TitleInput } from "../TitleInput/TitleInput";
@@ -35,7 +36,12 @@ export function ComposeForm(props: Props) {
           }}
         >
           <HStack width="full">
-            <CategorySelect control={form.control} name="category" />
+            <LStack gap="1">
+              <CategorySelect control={form.control} name="category" />
+              <FormErrorText>
+                {form.formState.errors["category"]?.message}
+              </FormErrorText>
+            </LStack>
             <ThreadTagListField
               name="tags"
               control={form.control}

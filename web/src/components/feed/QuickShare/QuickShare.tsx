@@ -18,9 +18,11 @@ import { Props, useQuickShare } from "./useQuickShare";
 export function QuickShare(props: Props) {
   const {
     form,
-    state: { formRef, hydratedLink, resetKey },
+    state: { formRef, hydratedLink, resetKey, requiresCategorySelect },
     handlers,
   } = useQuickShare(props);
+
+  const showCategorySelect = props.showCategorySelect || requiresCategorySelect;
 
   // TODO: Render a prompt to sign up to contribute if not logged in.
   if (!props.initialSession) {
@@ -46,11 +48,9 @@ export function QuickShare(props: Props) {
 
         <WStack
           w="full"
-          justifyContent={
-            props.showCategorySelect ? "space-between" : "flex-end"
-          }
+          justifyContent={showCategorySelect ? "space-between" : "flex-end"}
         >
-          {props.showCategorySelect && (
+          {showCategorySelect ? (
             <HStack alignItems="center">
               <CategorySelect control={form.control} name="category" />
 
@@ -58,6 +58,10 @@ export function QuickShare(props: Props) {
                 {form.formState.errors["category"]?.message}
               </FormErrorText>
             </HStack>
+          ) : (
+            <FormErrorText>
+              {form.formState.errors["category"]?.message}
+            </FormErrorText>
           )}
 
           <Button

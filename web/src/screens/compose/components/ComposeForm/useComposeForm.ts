@@ -8,6 +8,7 @@ import { handle } from "@/api/client";
 import { threadCreate, threadUpdate } from "@/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "@/api/openapi-schema";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
+import { useSettings } from "@/lib/settings/settings-client";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -22,6 +23,7 @@ export type FormShape = z.infer<typeof FormShapeSchema>;
 
 export function useComposeForm({ initialDraft, editing }: Props) {
   const router = useRouter();
+  const { settings } = useSettings();
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -42,7 +44,22 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         },
   });
 
+  function validateCategory(category: string | undefined) {
+    if (!settings?.require_thread_category || editing) return true;
+    if (category && category !== NO_CATEGORY_VALUE) {
+      form.clearErrors("category");
+      return true;
+    }
+
+    form.setError("category", {
+      message: "Choose a category before creating a thread.",
+    });
+    return false;
+  }
+
   const saveDraft = async (data: FormShape) => {
+    if (!validateCategory(data.category)) return;
+
     const payload: ThreadInitialProps = {
       ...data,
 
@@ -65,6 +82,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   };
 
   const publish = async ({ title, body, category, tags, url }: FormShape) => {
+    if (!validateCategory(category)) return;
+
     if (title.length < 1) {
       form.setError("title", {
         message: "Your post must have a title to be published",
@@ -95,8 +114,10 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     }
   };
 
-  const handleSaveDraft = form.handleSubmit((data) =>
-    handle(
+  const handleSaveDraft = form.handleSubmit((data) => {
+    if (!validateCategory(data.category)) return;
+
+    return handle(
       async () => {
         setIsSavingDraft(true);
         await saveDraft(data);
@@ -110,11 +131,13 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           setIsSavingDraft(false);
         },
       },
-    ),
-  );
+    );
+  });
 
-  const handlePublish = form.handleSubmit((data) =>
-    handle(
+  const handlePublish = form.handleSubmit((data) => {
+    if (!validateCategory(data.category)) return;
+
+    return handle(
       async () => {
         setIsPublishing(true);
         await publish(data);
@@ -128,14 +151,16 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           setIsPublishing(false);
         },
       },
-    ),
-  );
+    );
+  });
 
   const handleAssetUpload = async () => {
+    const state = form.getValues();
+    if (!validateCategory(state.category)) return;
+
     await handle(
       async () => {
         setIsSavingDraft(true);
-        const state = form.getValues();
         await saveDraft(state);
       },
       {
@@ -151,10 +176,12 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   };
 
   const handleAssetDelete = async () => {
+    const state = form.getValues();
+    if (!validateCategory(state.category)) return;
+
     await handle(
       async () => {
         setIsSavingDraft(true);
-        const state = form.getValues();
         await saveDraft(state);
       },
       {
