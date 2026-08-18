@@ -22,6 +22,9 @@ export interface ThreadInitialProps {
   body?: PostContent;
   tags?: TagNameList;
   meta?: Metadata;
+  /** Optional category ID. May be required at runtime when the
+`require_thread_category` instance setting is enabled.
+ */
   category?: Identifier;
   visibility?: Visibility;
   url?: Url;

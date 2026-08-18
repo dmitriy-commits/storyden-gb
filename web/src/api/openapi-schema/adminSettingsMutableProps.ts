@@ -21,6 +21,10 @@ export interface AdminSettingsMutableProps {
   accent_colour?: string;
   authentication_mode?: AuthMode;
   registration_mode?: RegistrationMode;
+  /** When true, new root threads must include a category. Replies and
+existing uncategorised threads are unaffected.
+ */
+  require_thread_category?: boolean;
   services?: AdminSettingsServiceProps;
   /**
    * The settings metadata may be used by frontends to store arbitrary

@@ -34,5 +34,9 @@ export interface AdminSettingsProps {
   services?: AdminSettingsServiceProps;
   metadata?: Metadata;
   motd?: MessageOfTheDay;
+  /** When true, new root threads must include a category. Replies and
+existing uncategorised threads are unaffected.
+ */
+  require_thread_category: boolean;
   headers?: NetworkHeadersSample;
 }

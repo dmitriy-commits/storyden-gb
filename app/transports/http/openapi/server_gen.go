@@ -2293,9 +2293,13 @@ type AdminSettingsMutableProps struct {
 	// by existing users with the required permission. When set to "disabled",
 	// new account registration is completely disabled and accounts can only be
 	// provisioned using the API.
-	RegistrationMode *RegistrationMode          `json:"registration_mode,omitempty"`
-	Services         *AdminSettingsServiceProps `json:"services,omitempty"`
-	Title            *string                    `json:"title,omitempty"`
+	RegistrationMode *RegistrationMode `json:"registration_mode,omitempty"`
+
+	// RequireThreadCategory When true, new root threads must include a category. Replies and
+	// existing uncategorised threads are unaffected.
+	RequireThreadCategory *bool                      `json:"require_thread_category,omitempty"`
+	Services              *AdminSettingsServiceProps `json:"services,omitempty"`
+	Title                 *string                    `json:"title,omitempty"`
 }
 
 // AdminSettingsProps Storyden installation and administration settings.
@@ -2346,9 +2350,13 @@ type AdminSettingsProps struct {
 	// by existing users with the required permission. When set to "disabled",
 	// new account registration is completely disabled and accounts can only be
 	// provisioned using the API.
-	RegistrationMode RegistrationMode           `json:"registration_mode"`
-	Services         *AdminSettingsServiceProps `json:"services,omitempty"`
-	Title            string                     `json:"title"`
+	RegistrationMode RegistrationMode `json:"registration_mode"`
+
+	// RequireThreadCategory When true, new root threads must include a category. Replies and
+	// existing uncategorised threads are unaffected.
+	RequireThreadCategory bool                       `json:"require_thread_category"`
+	Services              *AdminSettingsServiceProps `json:"services,omitempty"`
+	Title                 string                     `json:"title"`
 
 	// WebAddress The public web frontend address for this Storyden instance.
 	WebAddress string `json:"web_address"`
@@ -3732,7 +3740,11 @@ type Info struct {
 	// new account registration is completely disabled and accounts can only be
 	// provisioned using the API.
 	RegistrationMode RegistrationMode `json:"registration_mode"`
-	Title            string           `json:"title"`
+
+	// RequireThreadCategory When true, new root threads must include a category. Replies and
+	// existing uncategorised threads are unaffected.
+	RequireThreadCategory bool   `json:"require_thread_category"`
+	Title                 string `json:"title"`
 
 	// WebAddress The public web frontend address for this Storyden instance.
 	WebAddress string `json:"web_address"`

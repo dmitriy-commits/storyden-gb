@@ -39,6 +39,7 @@ export function ThreadFeedScreen({
           initialSession={session}
           initialCategory={category}
           showCategorySelect={showCategorySelect}
+          initialSettings={initialSettings}
         />
       )}
       <ThreadFeed

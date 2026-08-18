@@ -7031,6 +7031,7 @@ components:
         - accent_colour
         - authentication_mode
         - registration_mode
+        - require_thread_category
         - capabilities
         - onboarding_status
         - web_address
@@ -7050,6 +7051,11 @@ components:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:
           $ref: "#/components/schemas/RegistrationMode"
+        require_thread_category:
+          type: boolean
+          description: |
+            When true, new root threads must include a category. Replies and
+            existing uncategorised threads are unaffected.
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         web_address:
@@ -7361,6 +7367,7 @@ components:
         - registration_mode
         - api_address
         - web_address
+        - require_thread_category
       properties:
         title:
           type: string
@@ -7384,6 +7391,11 @@ components:
           format: uri
           description: |
             The public API address for this Storyden instance.
+        require_thread_category:
+          type: boolean
+          description: |
+            When true, new root threads must include a category. Replies and
+            existing uncategorised threads are unaffected.
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         services:
@@ -7410,6 +7422,11 @@ components:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:
           $ref: "#/components/schemas/RegistrationMode"
+        require_thread_category:
+          type: boolean
+          description: |
+            When true, new root threads must include a category. Replies and
+            existing uncategorised threads are unaffected.
         services:
           $ref: "#/components/schemas/AdminSettingsServiceProps"
         metadata:
@@ -10631,7 +10648,11 @@ components:
         body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
-        category: { $ref: "#/components/schemas/Identifier" }
+        category:
+          description: |
+            Optional category ID. May be required at runtime when the
+            `require_thread_category` instance setting is enabled.
+          $ref: "#/components/schemas/Identifier"
         visibility: { $ref: "#/components/schemas/Visibility" }
         url: { $ref: "#/components/schemas/URL" }
 

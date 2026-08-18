@@ -33,4 +33,8 @@ export interface Info {
   api_address: string;
   metadata?: Metadata;
   motd?: MessageOfTheDay;
+  /** When true, new root threads must include a category. Replies and
+existing uncategorised threads are unaffected.
+ */
+  require_thread_category: boolean;
 }
