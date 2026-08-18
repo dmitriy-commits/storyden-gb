@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -31,6 +32,7 @@ func TestThreads(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
+		settingsRepo *settings.SettingsRepository,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -52,6 +54,64 @@ func TestThreads(t *testing.T) {
 			r.Equal(cat1name, cat1create.JSON200.Name)
 			r.Equal("category testing", cat1create.JSON200.Description)
 			r.Equal(mark.Slugify(cat1name), cat1create.JSON200.Slug)
+
+			t.Run("require_thread_category_setting", func(t *testing.T) {
+				r := require.New(t)
+
+				settingsUpdate := tests.AssertRequest(
+					cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{
+						RequireThreadCategory: opt.New(true).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+				defer func() {
+					_, err := settingsRepo.Set(root, settings.Settings{
+						RequireThreadCategory: opt.New(false),
+					})
+					r.NoError(err)
+				}()
+				r.True(settingsUpdate.JSON200.RequireThreadCategory)
+				settingsGet := tests.AssertRequest(
+					cl.AdminSettingsGetWithResponse(root, session1),
+				)(t, http.StatusOK)
+				r.True(settingsGet.JSON200.RequireThreadCategory)
+
+				tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>missing category</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Missing category",
+					}, session1),
+				)(t, http.StatusBadRequest)
+
+				withCategory := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>with category</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "With category",
+					}, session1),
+				)(t, http.StatusOK)
+
+				reply := tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, withCategory.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "reply without category",
+					}, session2),
+				)(t, http.StatusOK)
+				r.Equal(acc2.ID.String(), reply.JSON200.Author.Id)
+			})
+
+			t.Run("uncategorised_threads_allowed_by_default", func(t *testing.T) {
+				r := require.New(t)
+
+				threadCreate := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>uncategorised</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Uncategorised thread",
+					}, session1),
+				)(t, http.StatusOK)
+				r.Nil(threadCreate.JSON200.Category)
+			})
 
 			t.Run("thread_replies", func(t *testing.T) {
 				r := require.New(t)
