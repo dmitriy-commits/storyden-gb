@@ -99,6 +99,7 @@ export function mergeAdminSettingsIntoInfo(
     metadata: admin.metadata ?? current.metadata,
     motd: admin.motd,
     registration_mode: admin.registration_mode,
+    require_thread_category: admin.require_thread_category,
     title: admin.title,
     web_address: admin.web_address,
   };
