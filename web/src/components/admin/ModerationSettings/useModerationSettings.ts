@@ -15,6 +15,7 @@ export const FormSchema = z.object({
   replyBodyMaxSize: z.number().min(0).max(1_000_000),
   wordBlockList: z.array(z.string()),
   wordReportList: z.array(z.string()),
+  requireThreadCategory: z.boolean(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -29,6 +30,7 @@ export function useModerationSettings({ settings }: Props) {
         settings.services?.moderation?.reply_body_length_max ?? 10_000,
       wordBlockList: settings.services?.moderation?.word_block_list ?? [],
       wordReportList: settings.services?.moderation?.word_report_list ?? [],
+      requireThreadCategory: settings.require_thread_category,
     },
   });
 
@@ -36,6 +38,7 @@ export function useModerationSettings({ settings }: Props) {
     await handle(
       async () => {
         await updateSettings({
+          require_thread_category: data.requireThreadCategory,
           services: {
             moderation: {
               thread_body_length_max: data.threadBodyMaxSize,

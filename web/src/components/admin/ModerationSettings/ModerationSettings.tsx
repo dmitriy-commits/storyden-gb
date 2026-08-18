@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -6,6 +7,7 @@ import { NumberInputField } from "@/components/ui/number-input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { Text } from "@/components/ui/text";
 import { Flex, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Controller } from "react-hook-form";
 
 import { ModerationWordListEditorField } from "./ModerationWordListEditor.field";
 import { Form, Props, useModerationSettings } from "./useModerationSettings";
@@ -74,6 +76,29 @@ export function ModerationSettingsForm(props: Props) {
           </FormHelperText>
         </FormControl>
       </Flex>
+
+      <FormControl>
+        <FormLabel>Thread categories</FormLabel>
+        <Controller
+          control={control}
+          name="requireThreadCategory"
+          render={({ field }) => (
+            <Checkbox
+              size="sm"
+              checked={!!field.value}
+              onCheckedChange={({ checked }) => {
+                field.onChange(checked === true);
+              }}
+            >
+              Require category for new threads
+            </Checkbox>
+          )}
+        />
+        <FormHelperText>
+          When enabled, members must choose a category before creating a new
+          thread. Replies are unaffected.
+        </FormHelperText>
+      </FormControl>
 
       <Flex
         flexDir={{
